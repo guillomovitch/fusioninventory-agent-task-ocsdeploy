@@ -8,7 +8,7 @@ include 'Module::AutoInstall';
 
 abstract 'OCS Software deployment support for FusionInventory Agent';
 license 'gpl';
-version $version;
+version_from 'lib/FusionInventory/Agent/Task/OcsDeploy.pm';
 
 perl_version '5.006';
 requires 'FusionInventory::Agent' => '2.0';
