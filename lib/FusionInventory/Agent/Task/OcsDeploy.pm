@@ -596,12 +596,7 @@ sub downloadAndConstruct {
     return 1;
 }
 
-=item setErrorCode
-
-Set the ErrCode to report for the following code block in case of error.
-
-=cut
-
+#Set the ErrCode to report for the following code block in case of error.
 sub setErrorCode {
     my ( $self, $errorCode ) = @_;
 
@@ -614,12 +609,7 @@ sub setErrorCode {
     return 1;
 }
 
-=item reportError
-
-Report error to the server and to the user throught the logger
-
-=cut
-
+# Report error to the server and to the user throught the logger
 sub reportError {
     my ( $self, $orderId, $message ) = @_;
 
@@ -1008,3 +998,19 @@ sub findMirror {
 
 1;
 
+
+__END__
+
+=head1 NAME
+
+FusionInventory::Agent::Task::OcsDeploy - OCS Inventory Software deployment support for FusionInvnetory Agent
+
+=head1 DESCRIPTION
+
+With this module, F<FusionInventory> can accept software deployment
+request from an OCS Inventory server.
+
+OCS Inventory uses SSL certificat to authentificat the server. You may have
+to point F<--ca-cert-file> or F<--ca-cert-dir> to your public certificat.
+
+=cut

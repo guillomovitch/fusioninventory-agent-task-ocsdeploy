@@ -1,0 +1,5 @@
+ABOUT
+ With this module, FusionInventory can accept OCS Inventory software
+ deployment order.
+ With this module, the agent is also able to do peer to peer file
+ exchange with the other FusionInventory Agent.
