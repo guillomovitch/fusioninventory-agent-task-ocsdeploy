@@ -1,6 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
 use threads;
-our $VERSION = '1.0';
+our $VERSION = '1.0.1';
 # TODO
 # TIMEOUT="30" number of retry to do on a download
 # CYCLE_LATENCY="60" time to wait between each different priority processing
