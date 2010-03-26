@@ -1,0 +1,3 @@
+version=3
+http://search.cpan.org/dist/FusionInventory-Agent-Task-OcsDeploy/ .*/FusionInventory-Task-OcsDeploy-v?(\d[\d_.]+)\.(:tar(?:\.gz|\.bz2))
+

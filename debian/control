@@ -1,0 +1,20 @@
+Source: libfusioninventory-agent-task-ocsdeploy-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl
+Maintainer: Gonéri Le Bouder <goneri@rulezlan.org>
+Standards-Version: 3.8.4
+Homepage: http://FusionInventory.org
+Vcs-Git: git://github.com/goneri/fusioninventory-agent-task-ocsdeploy.git
+Vcs-Browser: http://github.com/goneri/fusioninventory-agent-task-ocsdeploy
+
+Package: libfusioninventory-agent-task-ocsdeploy-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, fusioninventory-agent,
+ libxml-simple-perl, libfile-copy-recursive-perl, libfile-path-perl,
+Description: OCS Inventory Software Deployment support for FusionInventory
+ This module add OCS Inventory Software Deployement support in the
+ FusionInventory Agent.
+ It also supports Peer to Peer file exchange to reduce the network bandwidth
+ usage.
