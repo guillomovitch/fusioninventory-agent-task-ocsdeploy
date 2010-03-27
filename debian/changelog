@@ -1,6 +1,6 @@
 libfusioninventory-agent-task-ocsdeploy-perl (1.0.1-1) unstable; urgency=low
 
-  * Initial release. (Closes: #XXXX)
+  * Initial release. (Closes: #575598)
 
  -- Gonéri Le Bouder <goneri@rulezlan.org>  Fri, 26 Mar 2010 18:41:37 +0100
 
