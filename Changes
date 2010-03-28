@@ -1,5 +1,8 @@
 Revision history for FusionInventory::Agent::Task::OcsDeploy 
 
+1.0.2  Sun, 28 Mar 2010 21:39:55 +0200
+       * Fix Storage calls
+
 1.0.1  Fri, 26 Mar 2010 17:43:04 +0100
        * Use GPLv2+
         - Add LICENSE file
