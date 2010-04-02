@@ -18,7 +18,6 @@ requires 'File::Copy' => undef;
 requires 'File::Glob' => undef;
 requires 'File::Path' => undef;
 requires 'File::Copy::Recursive' => undef;
-requires 'Digest::MD5' => undef;
 requires 'Archive::Extract' => undef;
 
 WriteAll;

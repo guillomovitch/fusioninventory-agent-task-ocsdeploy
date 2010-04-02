@@ -1,5 +1,8 @@
 Revision history for FusionInventory::Agent::Task::OcsDeploy 
 
+1.0.3  Fri, 02 Apr 2010 09:43:13 +0200
+       * Makefile.PL: Drop duplicate Digest::MD5 entry in dependency list
+
 1.0.2  Sun, 28 Mar 2010 21:39:55 +0200
        * Fix Storage calls
 
