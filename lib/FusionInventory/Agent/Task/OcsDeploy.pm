@@ -53,7 +53,7 @@ use strict;
 use warnings;
 
 use Carp;
-use XML::Simple;
+use XML::TreePP;
 use File::Copy;
 use File::Glob;
 use File::Path;
@@ -753,6 +753,7 @@ sub readProlog {
     # The XML is ill formated and we have to run a loop to retriev
     # the different keys
     foreach my $paramHash (@$conf) {
+        $self->dropDashFromXMLTreePP($paramHash);
         if ( $paramHash->{TYPE} eq 'CONF' ) {
 
             # Save the config sent during the PROLOG
@@ -795,7 +796,11 @@ sub readProlog {
                 next;
             }
 
-            my $infoHash = XML::Simple::XMLin($content);
+            my $tpp = XML::TreePP->new();
+            $tpp->set( attr_prefix => '' );
+            my $tmp = $tpp->parse($content);
+            my $infoHash = $tmp->{DOWNLOAD};
+            use Data::Dumper;
             if ( !$infoHash ) {
                 $self->reportError( $orderId,
                     "Failed to parse info file `$infoURI'" );
@@ -879,6 +884,17 @@ sub _processFindMirrorResult {
 
     return ();
 
+}
+
+sub dropDashFromXMLTreePP {
+    my ($self, $href) = @_;
+    # XML::Tree add '-' prefix to key name
+    foreach my $k (keys %$href) {
+        if ($k =~ /^-(.+)/) {
+            $href->{$1} = $href->{$k};
+            delete($href->{$k});
+        }
+    }
 }
 
 sub findMirror {
