@@ -1,53 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
 use threads;
 our $VERSION = '1.0.2';
-# TODO
-# TIMEOUT="30" number of retry to do on a download
-# CYCLE_LATENCY="60" time to wait between each different priority processing
-# PERIOD_LENGTH="10" nbr of cylce during a period
-#
-# DONE
-# FRAG_LATENCY="10" time to wait between to frag
-# PERIOD_LATENCY="1" time to wait between to package
-
-#
-# period()
-#  for i in PERIOD_LENGTH
-#    foreach priority
-#      foreach package per priority
-#         ' download each frags
-#         ' sleep()FRAG_LATENCY
-#      - then sleep(CYCLE_LATENCY)
-#    - at the end sleep(PERIOD_LATENCY)
-#
-#
-#
-#
-
-# Info file:
-# <DOWNLOAD
-#ID="1270501158"
-#
-#PRI="5" ← Priority 0 to 10
-#ACT="STORE" ← Action, can be STORE/LAUNCH/EXECUTE
-#DIGEST="f6ebcc9828a6f5cabe6d0f2eb31aa656" ← MD5 of the final archive
-#PROTO="HTTP" ← The protocle to use to retrieve the archive parts
-#FRAGS="1" ← number of parts of the archive
-#DIGEST_ALGO="MD5" ← the digest method. can't be changed
-#DIGEST_ENCODE="Hexa" ← the digest encoding. can't changed
-#PATH="/root" ← Where to extract the archive if ACT=STORE
-#NAME="" ← command to exec if ACT=LAUNCH
-#COMMAND="" ← Command to run if ACT=EXECUTE
-#NOTIFY_USER="0" ← Windows user pop-up
-#NOTIFY_TEXT="" ← Windows user pop test
-#NOTIFY_COUNTDOWN="" ← etc
-#NOTIFY_CAN_ABORT="0"
-#NOTIFY_CAN_DELAY="0"
-#NEED_DONE_ACTION="0"
-#NEED_DONE_ACTION_TEXT=""
-#GARDEFOU="rien"
-#/>
-#
 
 use strict;
 use warnings;
