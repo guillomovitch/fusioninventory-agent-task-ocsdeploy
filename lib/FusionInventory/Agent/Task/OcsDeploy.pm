@@ -294,7 +294,7 @@ sub extractArchive {
                 "Unknow magic number $magicNumber! "
               . "Sorry I can't extract this archive ( $downloadDir/final ). "
               . "If you think, your archive is valide, please submit a bug on "
-              . "http://launchpad.net/ocsinventory with this message and the "
+              . "http://Forge.FusionInventory.org with this message and the "
               . "archive." );
         return;
     }
