@@ -172,7 +172,43 @@ sub diskIsFull {
 
     my $spaceFree;
     if ($^O =~ /^MSWin/) {
-        $logger->fault("isDiskFull doesn't work on Windows");
+
+        if (!eval ('
+                use Win32::OLE qw(in CP_UTF8);
+                use Win32::OLE::Const;
+
+                Win32::OLE->Option(CP => CP_UTF8);
+
+                1')) {
+            $logger->error("Failed to load Win32::OLE: $@");
+        }
+
+
+        my $letter;
+        if ($self->{downloadBaseDir} !~ /^(\w):./) {
+            $logger->error("Path parse error: ".$self->{downloadBaseDir});
+            return;
+        }
+        $letter = $1.':';
+
+
+        my $WMIServices = Win32::OLE->GetObject(
+            "winmgmts:{impersonationLevel=impersonate,(security)}!//./" );
+
+        if (!$WMIServices) {
+            $logger->error(Win32::OLE->LastError());
+            return;
+        }
+
+        foreach my $properties ( Win32::OLE::in(
+                $WMIServices->InstancesOf('Win32_LogicalDisk'))) {
+
+            next unless lc($properties->{Caption}) eq lc($letter);
+            my $t = $properties->{FreeSpace};
+            if ($t && $t =~ /(\d+)\d{6}$/) {
+                $spaceFree = $1;
+            }
+        }
     } else {
         my $dfFh;
         if (open($dfFh, '-|', "df", '-Pm', $self->{downloadBaseDir})) {
