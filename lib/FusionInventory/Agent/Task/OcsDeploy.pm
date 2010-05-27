@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use XML::Simple;
 use File::Copy;
-use File::Glob;
+use File::Glob ':glob';
 use File::Path;
 use File::stat;
 use Digest::MD5 qw(md5);
@@ -317,7 +317,7 @@ sub extractArchive {
     if ($@) {
         $logger->debug("Archive::Extract not found: $@, will use tar directly.");
 	if ($type->{$magicNumber} eq 'tgz') {
-            system("cd $runDir && gunzip -q < $downloadDir/final | tar xvf -")
+            system("cd \"$runDir\" && gunzip -q < \"$downloadDir/final\" | tar xvf -")
         } else {
             $logger->error("Archive type: `".$type->{$magicNumber}.
                             " not supported. Please install ".
@@ -369,7 +369,7 @@ sub processOrderCmd {
             $self->clean( { orderId => $orderId, purge => 1 } );
             return;
         }
-        foreach ( glob("$runDir/*") ) {
+        foreach ( bsd_glob("$runDir/*") ) {
             if (   ( -d $_ && !dirmove( $_, $order->{PATH} ) )
                 && ( -f $_ && !move( $_, $order->{PATH} ) ) )
             {
