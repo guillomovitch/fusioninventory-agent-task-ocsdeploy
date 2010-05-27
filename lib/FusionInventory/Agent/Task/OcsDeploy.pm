@@ -978,7 +978,7 @@ sub findMirror {
 
                     # https://rt.cpan.org/Public/Bug/Display.html?id=41007
                     # http://www.perlmonks.org/index.pl?node_id=407374
-                    if ( $^O =~ /^MSWin/x ) {
+                    if ( 0 ) {
 
                         if ( @{$self->{findMirrorThreads}} > 1 ) {
                             ($lastValdidIp, $url) = $self->_joinFindMirrorThread();
