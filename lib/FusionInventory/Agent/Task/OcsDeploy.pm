@@ -309,6 +309,19 @@ sub extractArchive {
                             " not supported. Please install ".
                             " Archive::Extractsubmit a patch.");
         }
+    } elsif ($^O =~ /^solaris/i) {
+        my $dfFh;
+        if (open($dfFh, '-|', "df", '-b', $self->{downloadBaseDir})) {
+            foreach(<$dfFh>) {
+                if (/^\S+\s+(\d+)/) {
+                    $spaceFree = int($1/1024);
+                }
+            }
+            close $dfFh
+        } else {
+            $logger->error("Failed to exec df");
+        }
+
     } else {
         $logger->debug("Archive::Extract found");
         $Archive::Extract::DEBUG = $config->{debug} ? 1 : 0;
