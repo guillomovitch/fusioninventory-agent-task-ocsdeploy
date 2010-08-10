@@ -1,6 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
 use threads;
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use strict;
 use warnings;
@@ -209,6 +209,18 @@ sub diskIsFull {
                 $spaceFree = $1;
             }
         }
+    } elsif ($^O =~ /^solaris/i) {
+        my $dfFh;
+        if (open($dfFh, '-|', "df", '-b', $self->{downloadBaseDir})) {
+            foreach(<$dfFh>) {
+                if (/^\S+\s+(\d+)/) {
+                    $spaceFree = int($1/1024);
+                }
+            }
+            close $dfFh
+        } else {
+            $logger->error("Failed to exec df");
+        }
     } else {
         my $dfFh;
         if (open($dfFh, '-|', "df", '-Pm', $self->{downloadBaseDir})) {
@@ -323,19 +335,6 @@ sub extractArchive {
                             " not supported. Please install ".
                             " Archive::Extractsubmit a patch.");
         }
-    } elsif ($^O =~ /^solaris/i) {
-        my $dfFh;
-        if (open($dfFh, '-|', "df", '-b', $self->{downloadBaseDir})) {
-            foreach(<$dfFh>) {
-                if (/^\S+\s+(\d+)/) {
-                    $spaceFree = int($1/1024);
-                }
-            }
-            close $dfFh
-        } else {
-            $logger->error("Failed to exec df");
-        }
-
     } else {
         $logger->debug("Archive::Extract found");
         $Archive::Extract::DEBUG = $config->{debug} ? 1 : 0;
