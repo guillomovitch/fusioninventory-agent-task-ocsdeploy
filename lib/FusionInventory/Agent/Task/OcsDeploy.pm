@@ -1,28 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
 use threads;
-our $VERSION = '1.0.2';
-# TODO
-# TIMEOUT="30" number of retry to do on a download
-# CYCLE_LATENCY="60" time to wait between each different priority processing
-# PERIOD_LENGTH="10" nbr of cylce during a period
-#
-# DONE
-# FRAG_LATENCY="10" time to wait between to frag
-# PERIOD_LATENCY="1" time to wait between to package
-
-#
-# period()
-#  for i in PERIOD_LENGTH
-#    foreach priority
-#      foreach package per priority
-#         ' download each frags
-#         ' sleep()FRAG_LATENCY
-#      - then sleep(CYCLE_LATENCY)
-#    - at the end sleep(PERIOD_LATENCY)
-#
-#
-#
-#
+our $VERSION = '1.0.3';
 
 use strict;
 use warnings;
@@ -30,7 +8,7 @@ use warnings;
 use Carp;
 use XML::Simple;
 use File::Copy;
-use File::Glob;
+use File::Glob ':glob';
 use File::Path;
 use File::stat;
 use Digest::MD5 qw(md5);
@@ -194,7 +172,43 @@ sub diskIsFull {
 
     my $spaceFree;
     if ($^O =~ /^MSWin/) {
-        $logger->fault("isDiskFull doesn't work on Windows");
+
+        if (!eval ('
+                use Win32::OLE qw(in CP_UTF8);
+                use Win32::OLE::Const;
+
+                Win32::OLE->Option(CP => CP_UTF8);
+
+                1')) {
+            $logger->error("Failed to load Win32::OLE: $@");
+        }
+
+
+        my $letter;
+        if ($self->{downloadBaseDir} !~ /^(\w):./) {
+            $logger->error("Path parse error: ".$self->{downloadBaseDir});
+            return;
+        }
+        $letter = $1.':';
+
+
+        my $WMIServices = Win32::OLE->GetObject(
+            "winmgmts:{impersonationLevel=impersonate,(security)}!//./" );
+
+        if (!$WMIServices) {
+            $logger->error(Win32::OLE->LastError());
+            return;
+        }
+
+        foreach my $properties ( Win32::OLE::in(
+                $WMIServices->InstancesOf('Win32_LogicalDisk'))) {
+
+            next unless lc($properties->{Caption}) eq lc($letter);
+            my $t = $properties->{FreeSpace};
+            if ($t && $t =~ /(\d+)\d{6}$/) {
+                $spaceFree = $1;
+            }
+        }
     } else {
         my $dfFh;
         if (open($dfFh, '-|', "df", '-Pm', $self->{downloadBaseDir})) {
@@ -303,7 +317,7 @@ sub extractArchive {
     if ($@) {
         $logger->debug("Archive::Extract not found: $@, will use tar directly.");
 	if ($type->{$magicNumber} eq 'tgz') {
-            system("cd $runDir && gunzip -q < $downloadDir/final | tar xvf -")
+            system("cd \"$runDir\" && gunzip -q < \"$downloadDir/final\" | tar xvf -")
         } else {
             $logger->error("Archive type: `".$type->{$magicNumber}.
                             " not supported. Please install ".
@@ -368,7 +382,7 @@ sub processOrderCmd {
             $self->clean( { orderId => $orderId, purge => 1 } );
             return;
         }
-        foreach ( glob("$runDir/*") ) {
+        foreach ( bsd_glob("$runDir/*") ) {
             if (   ( -d $_ && !dirmove( $_, $order->{PATH} ) )
                 && ( -f $_ && !move( $_, $order->{PATH} ) ) )
             {
@@ -977,7 +991,7 @@ sub findMirror {
 
                     # https://rt.cpan.org/Public/Bug/Display.html?id=41007
                     # http://www.perlmonks.org/index.pl?node_id=407374
-                    if ( $^O =~ /^MSWin/x ) {
+                    if ( 0 ) {
 
                         if ( @{$self->{findMirrorThreads}} > 1 ) {
                             ($lastValdidIp, $url) = $self->_joinFindMirrorThread();

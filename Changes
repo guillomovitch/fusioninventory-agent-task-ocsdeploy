@@ -3,7 +3,11 @@ Revision history for FusionInventory::Agent::Task::OcsDeploy
 1.0.4
        * Solaris: Fix free disk space detection
 
-1.0.3  Fri, 02 Apr 2010 09:43:13 +0200
+1.0.3  Fri, 28 May 2010 01:06:26 +0200
+       * Add a test script: t/use.t
+       * Win32 support
+         - more LWP + thread
+         - use bsd_glob
        * Makefile.PL: Drop duplicate Digest::MD5 entry in dependency list
 
 1.0.2  Sun, 28 Mar 2010 21:39:55 +0200
