@@ -1,5 +1,9 @@
 Revision history for FusionInventory::Agent::Task::OcsDeploy 
 
+1.0.5  Thu, 12 Aug 2010 22:17:29 +0200
+       * depends on 'threads', thanks Andreas Koenig
+         https://rt.cpan.org/Ticket/Display.html?id=60286
+
 1.0.4  Tue, 10 Aug 2010 18:00:16 +0200
        * Solaris: Fix free disk space detection
 
