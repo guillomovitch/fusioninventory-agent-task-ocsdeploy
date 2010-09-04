@@ -1,5 +1,10 @@
 Revision history for FusionInventory::Agent::Task::OcsDeploy 
 
+1.0.6  Sun, 05 Sep 2010 01:23:23 +0200
+       * Fix: store correctly file, not only directory,
+         thanks Guillaume GARSON for the bug report
+         http://forge.fusioninventory.org/issues/322
+
 1.0.5  Thu, 12 Aug 2010 22:17:29 +0200
        * depends on 'threads', thanks Andreas Koenig
          https://rt.cpan.org/Ticket/Display.html?id=60286

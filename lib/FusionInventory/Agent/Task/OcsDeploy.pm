@@ -383,7 +383,7 @@ sub processOrderCmd {
         }
         foreach ( bsd_glob("$runDir/*") ) {
             if (   ( -d $_ && !dirmove( $_, $order->{PATH} ) )
-                && ( -f $_ && !move( $_, $order->{PATH} ) ) )
+                || ( -f $_ && !move( $_, $order->{PATH} ) ) )
             {
                 $self->reportError( $orderId,
                     "Failed to copy $_ in " . $order->{PATH} . " :$!" );
