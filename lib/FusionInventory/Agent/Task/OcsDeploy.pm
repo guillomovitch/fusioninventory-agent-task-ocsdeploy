@@ -442,7 +442,7 @@ sub processOrderCmd {
         }
 
     }
-    $self->setErrorCode('CODE_SUCCESS');
+    $self->setErrorCode('SUCCESS_OK');
     $self->reportError( $orderId, "order processed" );
 
     return 1;
