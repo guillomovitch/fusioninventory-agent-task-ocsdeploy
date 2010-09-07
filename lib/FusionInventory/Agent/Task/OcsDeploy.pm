@@ -915,6 +915,7 @@ sub findMirror {
 
     foreach my $ip (@addresses) {
         next if $ip =~ /^127/x; # Ignore 127.x.x.x addresses
+        next if $ip =~ /^169/x; # Ignore 169.x.x.x range too
         if ($ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/x) {
 
             foreach (1..255) {
