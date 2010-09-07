@@ -966,6 +966,7 @@ sub findMirror {
                         my $rc;
                         my $begin;
                         my $end;
+			$logger->debug("url: $url");
                         eval {
                             local $SIG{ALRM} = sub { die "alarm\n" };
                             alarm 1;
