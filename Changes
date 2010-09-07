@@ -3,6 +3,10 @@ Revision history for FusionInventory::Agent::Task::OcsDeploy
 1.0.8  Tue, 07 Sep 2010 17:59:43 +0200
        * Fix the P2P on Windows XP, remove the -4 parameter from the route
          cmd call
+       * increase the timeout from 1 too 10 secondes. needed on Windows XP
+       * debug: print the tested URL
+       * ignore 169.x.x.x IP addresses
+       * don't sleep for FRAG_LATENCY
 
 1.0.7  Mon, 06 Sep 2010 12:22:40 +0200
        * Send err code SUCCESS_OK in case of success
