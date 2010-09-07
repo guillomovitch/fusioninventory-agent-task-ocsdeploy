@@ -969,7 +969,7 @@ sub findMirror {
 			$logger->debug("url: $url");
                         eval {
                             local $SIG{ALRM} = sub { die "alarm\n" };
-                            alarm 1;
+                            alarm 10;
                             $begin = Time::HiRes::time();
 
                             $rc = $network->getStore({
