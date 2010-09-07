@@ -522,7 +522,8 @@ sub downloadAndConstruct {
             # Can't find a mirror in my networks with the file, I grab it
             # directly from the main server
             $remoteFile = $baseUrl . '/' . $frag;
-            sleep($fragLatency);
+            #Already slow actually
+            #sleep($fragLatency);
         }
         my $localFile = $downloadDir . '/' . $frag;
 
