@@ -903,7 +903,7 @@ sub findMirror {
         }
     }
     elsif ( $^O =~ /^MSWin/x ) {
-        foreach (`route print -4`) {
+        foreach (`route print`) {
             next unless
             /^\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+255\.255\.\d+\.\d+/x;
             if (/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+\d+$/x) {
