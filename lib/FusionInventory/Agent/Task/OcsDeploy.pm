@@ -1,5 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
-our $VERSION = '1.1';
+use threads;
+our $VERSION = '1.0.7';
 
 use strict;
 use warnings;
@@ -80,6 +81,7 @@ sub main {
     }
 
     $self->{hosts} = {};
+    $self->{findMirrorThreads} = [];
 
     
     # Just in case some errors had not been sent
@@ -832,6 +834,27 @@ sub readProlog {
     return 1;
 }
 
+sub _joinFindMirrorThread {
+    my ($self) = @_;
+
+    my $lastValdidIp;
+    my $url;
+
+    my $logger = $self->{logger};
+
+    foreach ( @{$self->{findMirrorThreads}} ) {
+          my @ret = $self->_processFindMirrorResult($_->join());
+          ($lastValdidIp, $url) = @ret if @ret;
+    }
+    $self->{findMirrorThreads} = [];
+
+    if ($lastValdidIp) {
+        return ($lastValdidIp, $url);
+    } else {
+        return ();
+    }
+}
+
 sub _processFindMirrorResult {
     my ($self, $ip, $rc, $speed, $url) = @_;
 
@@ -894,7 +917,7 @@ sub findMirror {
         next if $ip =~ /^169/x; # Ignore 169.x.x.x range too
         if ($ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/x) {
 
-            foreach (1..256) {
+            foreach (1..255) {
                 next if $4==$_; # Ignore myself :) 
                 next if exists ($self->{hosts}{$1}{$2}{$3}{$_});
                 $self->{hosts}{$1}{$2}{$3}{$_}{lastCheck}=0;
@@ -915,38 +938,92 @@ sub findMirror {
         $self->{firstScanWarning} = 1;
     }
     $logger->debug("Looking for $orderId-$fragId");
-
-
-    if (!eval "use AnyEvent; use AnyEvent::Impl::Perl; use AnyEvent::HTTP; 1") {
-        $logger->info("Please install AnyEvent::HTTP to enable P2P");
-        return;
-    }
-    my $ended = 0;
-    my $cv = AnyEvent->condvar;
     NETSCAN: foreach my $a (keys %{$self->{hosts}}) {
         foreach my $b (keys %{$self->{hosts}{$a}}) {
             foreach my $c (keys %{$self->{hosts}{$a}{$b}}) {
                 foreach my $d (keys %{$self->{hosts}{$a}{$b}{$c}}) {
+                    # If the host had been detected as down during the last
+                    # 10 minutes, I ignore it
+                    if ($self->{hosts}{$a}{$b}{$c}{$d}{lastCheck}>(time -
+                            600)) {
+                        if (!$self->{hosts}{$a}{$b}{$c}{$d}{isUp}) {
+                            next;
+                        }
+                    }
 
-                    $url = "http://$a.$b.$c.$d:62354/deploy/$orderId/$orderId-$fragId";
 
-                    AnyEvent::HTTP::http_request (GET => $url, timeout => 30,
-                        sub {
-                            my ($body, $hdr) = @_;
+                    my $func = sub {
 
-                            $ended++;
+                        my $ip = "$a.$b.$c.$d";
+                        my $speed=0;
+                        my $url =
+                        "http://$ip:62354/deploy/$orderId/$orderId-$fragId";
 
-                            if ($hdr->{Status} == 200) {
-                                $cv->send($hdr->{URL});
-                            } elsif ($ended>=255) {
-                                $cv->send;
-                            }
-                        });
+                        my $rand     = int rand(0xffffffff);
+                        my $tempFile = $self->{tmpBaseDir}."/tmp." . $rand;
+
+                        my $rc;
+                        my $begin;
+                        my $end;
+			$logger->debug("url: $url");
+                        eval {
+                            local $SIG{ALRM} = sub { die "alarm\n" };
+                            alarm 5;
+                            $begin = Time::HiRes::time();
+
+                            $rc = $network->getStore({
+                                    source => $url,
+                                    target => $tempFile,
+                                    timeout => 3
+                                }) or croak;
+
+                            alarm 0;
+                        };
+                        $end = Time::HiRes::time();
+
+                        my $size = (stat($tempFile))[7];
+                        if ($size) {
+                            $speed = int($size / ($end - $begin) / 1024);
+                        }
+                        unlink $tempFile;
+                        return ($ip, $rc, $speed, $url);
+                    };
+
+
+                    # https://rt.cpan.org/Public/Bug/Display.html?id=41007
+                    # http://www.perlmonks.org/index.pl?node_id=407374
+                    if ( 0 ) {
+
+                        if ( @{$self->{findMirrorThreads}} > 1 ) {
+                            ($lastValdidIp, $url) = $self->_joinFindMirrorThread();
+                            last NETSCAN if $lastValdidIp;
+                        }
+
+
+                        my $thr = threads->create(
+                            { 'context'    => 'list' },
+                            $func
+                        );
+                        if ($thr) {
+                            push @{$self->{findMirrorThreads}}, $thr;
+                        }
+                    } else {
+                        ($lastValdidIp, $url) = $self->_processFindMirrorResult(&$func());
+                        last NETSCAN if $lastValdidIp;
+                    }
                 }
             }
         }
     }
-    return $cv->recv;
+    my @ret = $self->_joinFindMirrorThread();
+    ($lastValdidIp, $url) = @ret if @ret;
+
+    if ($url) {
+        $logger->debug("Mirror found on host $lastValdidIp");
+    } else {
+        $logger->debug("No mirror found");
+    }
+    return $url;
 }
 
 1;
