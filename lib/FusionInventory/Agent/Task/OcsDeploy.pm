@@ -968,13 +968,13 @@ sub findMirror {
 			$logger->debug("url: $url");
                         eval {
                             local $SIG{ALRM} = sub { die "alarm\n" };
-                            alarm 10;
+                            alarm 5;
                             $begin = Time::HiRes::time();
 
                             $rc = $network->getStore({
                                     source => $url,
                                     target => $tempFile,
-                                    timeout => 1
+                                    timeout => 3
                                 }) or croak;
 
                             alarm 0;
