@@ -16,7 +16,7 @@ use Digest::MD5 qw(md5);
 use File::Copy::Recursive qw(dirmove);
 use Time::HiRes;
 
-use Cwd;
+use Cwd qw(getcwd realpath);
 
 use FusionInventory::Logger;
 use FusionInventory::Agent::Storage;
@@ -68,10 +68,11 @@ sub main {
         $logger->fault('No vardir in $target');
     }
 
-    $self->{downloadBaseDir} = $self->{'target'}->{'vardir'} . '/deploy';
-    $self->{runBaseDir}      = $self->{target}->{vardir} . '/run';
-    $self->{tmpBaseDir}      = $self->{target}->{vardir} . '/tmp';
+    my $vardir = realpath($self->{'target'}->{'vardir'});
 
+    $self->{downloadBaseDir} =  $vardir. '/deploy';
+    $self->{runBaseDir}      = $vardir . '/run';
+    $self->{tmpBaseDir}      = $vardir . '/tmp';
 
     foreach (qw/downloadBaseDir runBaseDir tmpBaseDir/) {
         if ( !-d $self->{$_} && !mkpath( $self->{$_} ) ) {
@@ -460,7 +461,7 @@ sub downloadAndConstruct {
     my $orderId = $params->{orderId};
     my $order   = $myData->{byId}->{$orderId};
 
-    my $downloadBaseDir = $target->{vardir} . '/deploy';
+    my $downloadBaseDir = $self->{downloadBaseDir};
     my $downloadDir     = $downloadBaseDir . '/' . $orderId;
     if ( !-d $downloadDir && !mkpath($downloadDir) ) {
         $logger->error("Failed to create $downloadDir");
@@ -731,8 +732,6 @@ sub readProlog {
             10 => {},
         ];
     }
-
-    my $downloadBaseDir = $target->{vardir} . '/download';
 
     # The orders are send during the PROLOG. Since the prolog is
     # one of the arg of the check() function. We can process it.

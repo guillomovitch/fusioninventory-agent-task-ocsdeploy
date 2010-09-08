@@ -7,6 +7,8 @@ Revision history for FusionInventory::Agent::Task::OcsDeploy
        * debug: print the tested URL
        * ignore 169.x.x.x IP addresses
        * don't sleep for FRAG_LATENCY
+       * Avoid relative path with Archive::Extract
+         see: http://forge.fusioninventory.org/issues/329
 
 1.0.7  Mon, 06 Sep 2010 12:22:40 +0200
        * Send err code SUCCESS_OK in case of success
