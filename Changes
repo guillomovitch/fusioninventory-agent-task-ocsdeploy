@@ -1,6 +1,7 @@
 Revision history for FusionInventory::Agent::Task::OcsDeploy 
 
-1.0.8  Tue, 07 Sep 2010 17:59:43 +0200
+1.1
+       * Replace threads by AnyEvent
        * Fix the P2P on Windows XP, remove the -4 parameter from the route
          cmd call
        * increase the timeout from 1 too 3 secondes. needed on Windows XP
