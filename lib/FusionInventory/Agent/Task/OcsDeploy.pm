@@ -1,6 +1,6 @@
 package FusionInventory::Agent::Task::OcsDeploy;
 use threads;
-our $VERSION = '1.0.7';
+our $VERSION = '1.0.8';
 
 use strict;
 use warnings;
