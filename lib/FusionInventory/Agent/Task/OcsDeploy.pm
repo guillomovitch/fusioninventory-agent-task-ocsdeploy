@@ -19,7 +19,6 @@ use Time::HiRes;
 use UNIVERSAL::require;
 use XML::Simple;
 
-use FusionInventory::Logger;
 use FusionInventory::Agent::Network;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
