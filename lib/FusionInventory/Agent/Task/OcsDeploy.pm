@@ -30,25 +30,23 @@ our $VERSION = '1.0.8';
 sub main {
     my ($self) = @_;
 
+    if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
+        $self->{logger}->debug("No server. Exiting...");
+        return;
+    }
+
     my $storage = FusionInventory::Agent::Storage->new({
             target => {
                 vardir => $ARGV[0],
             }
-        });
+    });
 
-    my $data = $storage->restore({
-            module => "FusionInventory::Agent"
-        });
-    my $myData = $self->{myData} = $storage->restore();
+    $self->{myData} = $storage->restore();
 
-    my $config = $self->{config} = $data->{config};
-    my $target = $self->{'target'} = $data->{'target'};
-    my $logger = $self->{logger} = FusionInventory::Logger->new ({
-            config => $self->{config}
-        });
-    $self->{prologresp} = $data->{prologresp};
-
-
+    my $config = $self->{config};
+    my $target = $self->{target};
+    my $logger = $self->{logger};
+    my $myData = $self->{myData};
 
     if ($target->{'type'} ne 'server') {
         $logger->debug("No server. Exiting...");
@@ -161,8 +159,6 @@ sub main {
     }
 
 
-    $storage->save({ data => $myData });
-
     exit(0);
 }
 
@@ -248,7 +244,7 @@ sub clean {
 
     my $config  = $self->{config};
     my $logger  = $self->{logger};
-    my $myData = $self->{myData};
+    my $mydata  = $self->{myData};
 
     my $orderId = $params->{orderId};
     my $purge = $params->{purge} || 0;
@@ -281,7 +277,7 @@ sub extractArchive {
 
     my $config  = $self->{config};
     my $logger  = $self->{logger};
-    my $myData = $self->{myData};
+    my $myData  = $self->{myData};
 
     my $orderId = $params->{orderId};
 
@@ -455,7 +451,7 @@ sub downloadAndConstruct {
     my $config  = $self->{config};
     my $target  = $self->{target};
     my $logger  = $self->{logger};
-    my $myData = $self->{myData};
+    my $myData  = $self->{myData};
     my $network = $self->{network};
 
     my $orderId = $params->{orderId};
@@ -645,7 +641,7 @@ sub reportError {
 
     my $config  = $self->{config};
     my $logger  = $self->{logger};
-    my $myData = $self->{myData};
+    my $myData  = $self->{myData};
     my $target  = $self->{target};
 
     my $errorCode = $self->{errorCode};
@@ -685,7 +681,7 @@ sub pushErrorStack {
 
     my $logger  = $self->{logger};
     my $network = $self->{network};
-    my $myData = $self->{myData};
+    my $myData  = $self->{myData};
 
     if ( !$myData->{errorStack} ) {
         $myData->{errorStack} = [];
@@ -713,7 +709,7 @@ sub readProlog {
     my $network = $self->{network};
     my $target     = $self->{target};
     my $logger     = $self->{logger};
-    my $myData    = $self->{myData};
+    my $myData     = $self->{myData};
 
     if ( !$myData ) {
         $myData->{config}     = {};
