@@ -1,28 +1,28 @@
 package FusionInventory::Agent::Task::OcsDeploy;
-use threads;
-our $VERSION = '1.0.8';
 
 use strict;
 use warnings;
 
+use threads;
+
 use Carp;
-use XML::Simple;
+use Cwd qw(getcwd realpath);
+use Digest::MD5 qw(md5);
 use File::Copy;
+use File::Copy::Recursive qw(dirmove);
 use File::Glob ':glob';
 use File::Path;
 use File::stat;
-use Digest::MD5 qw(md5);
-
-use File::Copy::Recursive qw(dirmove);
 use Time::HiRes;
-
-use Cwd qw(getcwd realpath);
+use XML::Simple;
 
 use FusionInventory::Logger;
+use FusionInventory::Agent::Network;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
 use FusionInventory::Agent::XML::Response::Prolog;
-use FusionInventory::Agent::Network;
+
+our $VERSION = '1.0.8';
 
 sub main {
     my ( undef ) = @_;
