@@ -47,11 +47,6 @@ sub main {
     my $logger = $self->{logger};
     my $myData = $self->{myData};
 
-    if ($target->{'type'} ne 'server') {
-        $logger->debug("No server. Exiting...");
-        return;
-    }
-
     $self->{transmitter} = FusionInventory::Agent::Transmitter->new ({
         url            => $target->{path},
         proxy          => $config->{proxy},
