@@ -2,6 +2,7 @@ package FusionInventory::Agent::Task::OcsDeploy;
 
 use strict;
 use warnings;
+use base 'FusionInventory::Agent::Task';
 
 use threads;
 
@@ -26,10 +27,7 @@ use FusionInventory::Agent::XML::Response::Prolog;
 our $VERSION = '1.0.8';
 
 sub main {
-    my ( undef ) = @_;
-
-    my $self = {};
-    bless $self;
+    my ($self) = @_;
 
     my $storage = FusionInventory::Agent::Storage->new({
             target => {
