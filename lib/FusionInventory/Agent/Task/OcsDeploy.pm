@@ -19,8 +19,8 @@ use Time::HiRes;
 use UNIVERSAL::require;
 use XML::Simple;
 
-use FusionInventory::Agent::Network;
 use FusionInventory::Agent::Storage;
+use FusionInventory::Agent::Transmitter;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
 use FusionInventory::Agent::XML::Response::Prolog;
 
@@ -52,13 +52,15 @@ sub main {
         return;
     }
 
-    my $network = $self->{network} = FusionInventory::Agent::Network->new ({
-
-            logger => $logger,
-            config => $config,
-            target => $target,
-
-        });
+    $self->{transmitter} = FusionInventory::Agent::Transmitter->new ({
+        url            => $target->{path},
+        proxy          => $config->{proxy},
+        user           => $config->{user},
+        password       => $config->{password},
+        'no-ssl-check' => $config->{'no-ssl-check'},
+        'ca-cert-file' => $config->{'ca-cert-file'},
+        'ca-cert-dir'  => $config->{'ca-cert-dir'},
+    });
 
 
     if ( !exists( $self->{'target'}->{'vardir'} ) ) {
@@ -451,7 +453,7 @@ sub downloadAndConstruct {
     my $target  = $self->{target};
     my $logger  = $self->{logger};
     my $myData  = $self->{myData};
-    my $network = $self->{network};
+    my $transmitter = $self->{transmitter};
 
     my $orderId = $params->{orderId};
     my $order   = $myData->{byId}->{$orderId};
@@ -515,7 +517,7 @@ sub downloadAndConstruct {
         my $remoteFile = $self->findMirror( $orderId, $fragID );
         if ( !$remoteFile ) {
 
-            # Can't find a mirror in my networks with the file, I grab it
+            # Can't find a mirror in my transmitters with the file, I grab it
             # directly from the main server
             $remoteFile = $baseUrl . '/' . $frag;
             #Already slow actually
@@ -523,13 +525,13 @@ sub downloadAndConstruct {
         }
         my $localFile = $downloadDir . '/' . $frag;
 
-        my $rc = $network->getStore({
+        my $rc = $transmitter->getStore({
                 source => $remoteFile,
                 target => $localFile . '.part'
                 
             });
         
-        if ( $network->isSuccess({code => $rc}) && move( $localFile . '.part', $localFile ) ) {
+        if ( $transmitter->isSuccess({code => $rc}) && move( $localFile . '.part', $localFile ) ) {
 
             # TODO to a md5sum/sha256 check here
             $order->{ERROR_COUNT} = 0;
@@ -679,7 +681,7 @@ sub pushErrorStack {
     my ($self) = @_;
 
     my $logger  = $self->{logger};
-    my $network = $self->{network};
+    my $transmitter = $self->{transmitter};
     my $myData  = $self->{myData};
 
     if ( !$myData->{errorStack} ) {
@@ -688,7 +690,7 @@ sub pushErrorStack {
 
     if ( @{ $myData->{errorStack} } ) {
         my $message = $myData->{errorStack}->[0];
-        if ( $network->send( { message => $message } ) ) {
+        if ( $transmitter->send( { message => $message } ) ) {
             shift( @{ $myData->{errorStack} } );
         }
         else {
@@ -705,7 +707,7 @@ sub readProlog {
 
     my $prologresp = $self->{prologresp};
     my $config     = $self->{config};
-    my $network = $self->{network};
+    my $transmitter = $self->{transmitter};
     my $target     = $self->{target};
     my $logger     = $self->{logger};
     my $myData     = $self->{myData};
@@ -780,7 +782,7 @@ sub readProlog {
 
             my $infoURI =
               $protocl.'://' . $paramHash->{INFO_LOC} . '/' . $orderId . '/info';
-            my $content = $network->get({
+            my $content = $transmitter->get({
                     source => $infoURI,
                     timeout => 30
                 });
@@ -882,7 +884,7 @@ sub findMirror {
 
     my $config = $self->{config};
     my $logger = $self->{logger};
-    my $network = $self->{network};
+    my $transmitter = $self->{transmitter};
 
     my @addresses;
 
@@ -966,7 +968,7 @@ sub findMirror {
                             alarm 5;
                             $begin = Time::HiRes::time();
 
-                            $rc = $network->getStore({
+                            $rc = $transmitter->getStore({
                                     source => $url,
                                     target => $tempFile,
                                     timeout => 3
