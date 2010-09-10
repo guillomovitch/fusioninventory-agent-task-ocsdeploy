@@ -417,19 +417,19 @@ sub processOrderCmd {
             return;
         }
         system($cmd);
-        if ($?) {    # perldoc -f system :)
+        if ($CHILD_ERROR) {    # perldoc -f system :)
             $self->reportError( $orderId, "Failed to execute '$cmd'" );
             return;
         }
-        elsif ( $? & 127 ) {
+        elsif ( $CHILD_ERROR & 127 ) {
             my $msg = sprintf "'$cmd' died with signal %d, %s coredump\n",
-              ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
+              ( $CHILD_ERROR & 127 ), ( $CHILD_ERROR & 128 ) ? 'with' : 'without';
             $self->reportError( $orderId, $msg );
             return;
         }
         # RET_VAL doesn't exist yet server side
-        elsif ( $order->{RET_VAL} && $order->{RET_VAL} != ( $? >> 8 ) ) {
-            my $msg = sprintf "'$cmd' exited with value %d\n", $? >> 8;
+        elsif ( $order->{RET_VAL} && $order->{RET_VAL} != ( $CHILD_ERROR >> 8 ) ) {
+            my $msg = sprintf "'$cmd' exited with value %d\n", $CHILD_ERROR >> 8;
             $self->reportError( $orderId, $msg );
             return;
         }
