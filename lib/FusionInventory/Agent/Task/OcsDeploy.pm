@@ -22,7 +22,6 @@ use XML::Simple;
 use FusionInventory::Agent::Storage;
 use FusionInventory::Agent::Transmitter;
 use FusionInventory::Agent::XML::Query::SimpleMessage;
-use FusionInventory::Agent::XML::Response::Prolog;
 
 our $VERSION = '1.0.8';
 
