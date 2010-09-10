@@ -14,6 +14,7 @@ use File::Glob ':glob';
 use File::Path;
 use File::stat;
 use Time::HiRes;
+use UNIVERSAL::require;
 use XML::Simple;
 
 use FusionInventory::Logger;
@@ -326,7 +327,7 @@ sub extractArchive {
         return;
     }
 
-    eval "use Archive::Extract;";
+    Archive::Extract->require();
     if ($@) {
         $logger->debug("Archive::Extract not found: $@, will use tar directly.");
 	if ($type->{$magicNumber} eq 'tgz') {
