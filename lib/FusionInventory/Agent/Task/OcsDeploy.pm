@@ -50,7 +50,7 @@ sub main {
 
     if ($target->{'type'} ne 'server') {
         $logger->debug("No server. Exiting...");
-        exit(0);
+        return;
     }
 
     my $network = $self->{network} = FusionInventory::Agent::Network->new ({
@@ -159,7 +159,7 @@ sub main {
     }
 
 
-    exit(0);
+    return;
 }
 
 sub diskIsFull {
