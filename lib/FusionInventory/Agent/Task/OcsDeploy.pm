@@ -9,6 +9,7 @@ use threads;
 use Carp;
 use Cwd qw(getcwd realpath);
 use Digest::MD5 qw(md5);
+use English qw(-no_match_vars);
 use File::Copy;
 use File::Copy::Recursive qw(dirmove);
 use File::Glob ':glob';
@@ -180,7 +181,7 @@ sub diskIsFull {
                 Win32::OLE->Option(CP => CP_UTF8);
 
                 1')) {
-            $logger->error("Failed to load Win32::OLE: $@");
+            $logger->error("Failed to load Win32::OLE: $EVAL_ERROR");
         }
 
 
@@ -292,7 +293,7 @@ sub extractArchive {
     $self->setErrorCode('ERR_EXECUTE');    # ERR_EXTRACT ?
     my $fileFd;
     if ( !open $fileFd, "<", "$downloadDir/final" ) {
-        $self->reportError( $orderId, "Failed to open $downloadDir/final: $!" );
+        $self->reportError( $orderId, "Failed to open $downloadDir/final: $ERRNO" );
         return;
     }
     binmode($fileFd);
@@ -326,8 +327,8 @@ sub extractArchive {
     }
 
     Archive::Extract->require();
-    if ($@) {
-        $logger->debug("Archive::Extract not found: $@, will use tar directly.");
+    if ($EVAL_ERROR) {
+        $logger->debug("Archive::Extract not found: $EVAL_ERROR, will use tar directly.");
 	if ($type->{$magicNumber} eq 'tgz') {
             system("cd \"$runDir\" && gunzip -q < \"$downloadDir/final\" | tar xvf -")
         } else {
@@ -386,7 +387,7 @@ sub processOrderCmd {
                 || ( -f $_ && !move( $_, $order->{PATH} ) ) )
             {
                 $self->reportError( $orderId,
-                    "Failed to copy $_ in " . $order->{PATH} . " :$!" );
+                    "Failed to copy $_ in " . $order->{PATH} . " :$ERRNO" );
             }
         }
     }
@@ -405,7 +406,7 @@ sub processOrderCmd {
                 $cmd = './'.$cmd unless $cmd =~ /^\//x;
                 print "chmod : $runDir/$cmd\n";
                 if ( !-x "$runDir/$cmd" && chmod( 0755, "$runDir/$cmd" ) ) {
-                    $self->reportError( $orderId, "Cannot chmod: $!" );
+                    $self->reportError( $orderId, "Cannot chmod: $ERRNO" );
                     return;
                 }
             }
@@ -584,7 +585,7 @@ sub downloadAndConstruct {
             if ( !print {$finaleFileFd} $_ ) {
                 close $finaleFileFd;
                 $self->reportError( $orderId,
-                    "Failed to write in $localFile: $!" );
+                    "Failed to write in $localFile: $ERRNO" );
                 return;
             }
         }
