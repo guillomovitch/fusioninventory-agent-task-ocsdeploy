@@ -168,7 +168,7 @@ sub diskIsFull {
     my $logger = $self->{logger};
 
     my $spaceFree;
-    if ($^O =~ /^MSWin/) {
+    if ($OSNAME eq 'MSWin32') {
 
         if (!eval ('
                 use Win32::OLE qw(in CP_UTF8);
@@ -397,7 +397,7 @@ sub processOrderCmd {
 
         if ( $order->{ACT} eq 'LAUNCH' ) {
             $cmd = $order->{'NAME'};
-            if ( $^O !~ /^MSWin/x ) {
+            if ($OSNAME ne 'MSWin32') {
 # Mimic the old Download.pm agent...
                 $cmd = './'.$cmd unless $cmd =~ /^\//x;
                 print "chmod : $runDir/$cmd\n";
@@ -898,7 +898,7 @@ sub findMirror {
 
         }
     }
-    elsif ( $^O =~ /^MSWin/x ) {
+    elsif ($OSNAME eq 'MSWin32') {
         foreach (`route print`) {
             next unless
             /^\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+255\.255\.\d+\.\d+/x;
