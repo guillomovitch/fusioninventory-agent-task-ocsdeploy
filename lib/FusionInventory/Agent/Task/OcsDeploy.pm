@@ -25,7 +25,7 @@ use FusionInventory::Agent::XML::Query::SimpleMessage;
 
 our $VERSION = '1.0.8';
 
-sub main {
+sub run {
     my ($self) = @_;
 
     if (!$self->{target}->isa('FusionInventory::Agent::Target::Server')) {
